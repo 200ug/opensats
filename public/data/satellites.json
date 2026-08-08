@@ -1,0 +1,17 @@
+[
+    {"noradId": 39084, "name": "Landsat 8", "category": "landsat"},
+    {"noradId": 49260, "name": "Landsat 9", "category": "landsat"},
+    {"noradId": 39634, "name": "Sentinel-1A", "category": "sentinel"},
+    {"noradId": 40697, "name": "Sentinel-2A", "category": "sentinel"},
+    {"noradId": 42063, "name": "Sentinel-2B", "category": "sentinel"},
+    {"noradId": 60989, "name": "Sentinel-2C", "category": "sentinel"},
+    {"noradId": 41335, "name": "Sentinel-3A", "category": "sentinel"},
+    {"noradId": 43437, "name": "Sentinel-3B", "category": "sentinel"},
+    {"noradId": 25994, "name": "Terra", "category": "modis"},
+    {"noradId": 27424, "name": "Aqua", "category": "modis"},
+    {"noradId": 37849, "name": "Suomi NPP", "category": "weather"},
+    {"noradId": 43013, "name": "NOAA-20", "category": "weather"},
+    {"noradId": 54234, "name": "NOAA-21", "category": "weather"},
+    {"noradId": 40336, "name": "CBERS-4", "category": "cbers"},
+    {"noradId": 44883, "name": "CBERS-4A", "category": "cbers"}
+]
