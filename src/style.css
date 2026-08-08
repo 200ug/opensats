@@ -1,0 +1,41 @@
+/* TODO: switch to local, size-optimized woff2 font after testing */
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+@import "tailwindcss";
+
+@theme {
+    --color-border: #d6d6b1;
+    --color-land: #131112;
+    --color-crt-bg: #1d1d25;
+    --font-retro: "VT323", "Share Tech Mono", monospace;
+}
+
+/* satellite category colors; read imperatively via getComputedStyle, so they
+   live outside @theme (tailwind drops theme vars that no utility uses) */
+:root {
+    --sat-landsat: #ffb000;
+    --sat-sentinel: #33ccff;
+    --sat-modis: #ff66cc;
+    --sat-weather: #33ff66;
+    --sat-cbers: #ff5533;
+
+    /* rectangle selection: #ff5533 (?) */
+}
+
+/* maplibre handles its own canvas internally, utils can't be attached to it */
+#map canvas {
+    image-rendering: pixelated;
+}
+
+.crt {
+    position: relative;
+}
+
+/* scanlines + vignette overlay */
+.crt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.28) 0 1px, transparent 1px 3px);
+    box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.85);
+}
