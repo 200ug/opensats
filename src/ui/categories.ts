@@ -4,6 +4,7 @@ export interface CategoryMeta {
     id: string
     label: string
     color: string
+    count: number
 }
 
 export function initCategoryPanel(map: MaplibreMap, categories: CategoryMeta[]) {
@@ -28,8 +29,11 @@ export function initCategoryPanel(map: MaplibreMap, categories: CategoryMeta[]) 
         cb.type = "checkbox"
         cb.checked = true
         cb.addEventListener("change", () => {
-            if (cb.checked) enabled.add(cat.id)
-            else enabled.delete(cat.id)
+            if (cb.checked) {
+                enabled.add(cat.id)
+            } else {
+                enabled.delete(cat.id)
+            }
             updateFilter()
         })
 
@@ -37,7 +41,7 @@ export function initCategoryPanel(map: MaplibreMap, categories: CategoryMeta[]) 
         swatch.className = "inline-block h-3 w-3 border border-border"
         swatch.style.backgroundColor = cat.color
 
-        label.append(cb, swatch, document.createTextNode(cat.label))
+        label.append(cb, swatch, document.createTextNode(`${cat.label} (${cat.count})`))
         panel.append(label)
     }
 

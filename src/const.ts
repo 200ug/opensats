@@ -10,9 +10,9 @@ export const LAND = css("--color-land", "#101010")
 export const BORDER = css("--color-border", "#d0d0cb")
 export const CATEGORIES = ["landsat", "sentinel", "modis", "weather", "cbers"]
 
-export const PALETTE = Object.fromEntries(
+export const PALETTE = new Map<string, string>(
     CATEGORIES.map((c) => [c, css(`--sat-${c}`, "#ffffff")])
-) as Record<string, string>
+)
 
 export const SQUARE_ICON_SIZE = 8
 

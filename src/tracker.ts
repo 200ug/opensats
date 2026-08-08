@@ -9,7 +9,13 @@ import {
     type OMMJsonObject,
     type SatRec
 } from "satellite.js"
-import { CELESTRAK_FETCH_DELAY_MS, OMM_CACHE_KEY, OMM_CACHE_TTL, PALETTE, SQUARE_ICON_SIZE } from "./const"
+import {
+    CELESTRAK_FETCH_DELAY_MS,
+    OMM_CACHE_KEY,
+    OMM_CACHE_TTL,
+    PALETTE,
+    SQUARE_ICON_SIZE
+} from "./const"
 
 export interface SatelliteRecord {
     noradId: number
@@ -106,10 +112,11 @@ async function getOmmData(wantedIds: number[]): Promise<Map<number, OMMJsonObjec
     return cached ? toMap(cached) : new Map()
 }
 
-export async function initSatellites(map: MaplibreMap) {
+export async function initSatellites(map: MaplibreMap): Promise<Record<string, number>> {
     const registry: SatelliteRecord[] = await (await fetch("/data/satellites.json")).json()
     const ommData = await getOmmData(registry.map((s) => s.noradId))
 
+    const counts: Record<string, number> = {}
     const tracked: TrackedSatellite[] = []
 
     for (const s of registry) {
@@ -120,6 +127,7 @@ export async function initSatellites(map: MaplibreMap) {
             continue
         }
 
+        counts[s.category] = (counts[s.category] ?? 0) + 1
         tracked.push({ ...s, satrec: json2satrec(omm) })
     }
 
@@ -172,7 +180,7 @@ export async function initSatellites(map: MaplibreMap) {
                             name: s.name,
                             category: s.category,
                             altitude: geo.height,
-                            color: PALETTE[s.category] ?? "#ffffff"
+                            color: PALETTE.get(s.category) ?? "#ffffff"
                         }
                     } as GeoJsonFeature
                 })
@@ -181,7 +189,9 @@ export async function initSatellites(map: MaplibreMap) {
 
         ;(map.getSource("sats") as GeoJSONSource).setData(fc)
     }
-    tick()
 
-    return setInterval(tick, 1000) // 1 Hz
+    tick()
+    setInterval(tick, 1000) // 1 Hz
+
+    return counts
 }

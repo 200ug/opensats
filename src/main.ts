@@ -39,9 +39,9 @@ const map = new MaplibreMap({
 })
 
 map.on("load", async () => {
-    await initSatellites(map)
+    const counts = await initSatellites(map)
     initCategoryPanel(
         map,
-        CATEGORIES.map((id) => ({ id, label: id, color: PALETTE[id]! }))
+        CATEGORIES.map((id) => ({ id, label: id, color: PALETTE.get(id)!, count: counts[id] ?? 0 }))
     )
 })
