@@ -23,7 +23,7 @@ export function initCategoryPanel(map: MaplibreMap, categories: CategoryMeta[]) 
     for (const cat of categories) {
         const label = document.createElement("label")
         label.className =
-            "flex cursor-pointer items-center gap-2 font-retro text-ms uppercase tracking-wider text-border"
+            "flex cursor-pointer items-center gap-2 text-xs uppercase tracking-wider text-border"
 
         const cb = document.createElement("input")
         cb.type = "checkbox"

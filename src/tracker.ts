@@ -151,10 +151,21 @@ export async function initSatellites(map: MaplibreMap): Promise<Record<string, n
             "icon-image": "square",
             "icon-size": 1,
             "icon-allow-overlap": true,
-            "icon-ignore-placement": true
+            "icon-ignore-placement": true,
+            "text-field": ["get", "name"],
+            "text-font": ["ShareTechMono"],
+            "text-size": 16,
+            "text-offset": [0.9, 0], // just right of the square
+            "text-anchor": "left",
+            "text-transform": "uppercase",
+            "text-allow-overlap": true,
+            "text-ignore-placement": true
         },
         paint: {
-            "icon-color": ["get", "color"] as unknown as string
+            "icon-color": ["get", "color"],
+            "text-color": ["get", "color"], // match the square
+            "text-halo-color": "#050805",
+            "text-halo-width": 1
         }
     })
 

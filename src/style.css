@@ -1,12 +1,16 @@
-/* TODO: switch to local, size-optimized woff2 font after testing */
-@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
 @import "tailwindcss";
+
+@font-face {
+    font-family: "ShareTechMono";
+    src: url("/fonts/ShareTechMono-Regular.woff2") format("woff2");;
+}
 
 @theme {
     --color-border: #d6d6b1;
     --color-land: #131112;
     --color-crt-bg: #1d1d25;
-    --font-retro: "VT323", "Share Tech Mono", monospace;
+
+    --default-font-family: "ShareTechMono", monospace;
 }
 
 /* satellite category colors; read imperatively via getComputedStyle, so they
@@ -18,7 +22,7 @@
     --sat-weather: #33ff66;
     --sat-cbers: #ff5533;
 
-    /* rectangle selection: #ff5533 (?) */
+    /* TODO: rectangle selection color */
 }
 
 /* maplibre handles its own canvas internally, utils can't be attached to it */
