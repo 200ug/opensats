@@ -10,6 +10,7 @@ fi
 INPUT_TTF="$1"
 OUTPUT_WOFF="${INPUT_TTF%.*}.woff2"
 
+# only leaves printable ASCII, non-breaking space, & smart punctuation unicode ranges
 echo "[*] ttf->woff2 & unicode stripping ..."
 pyftsubset "$INPUT_TTF" \
   --output-file="$OUTPUT_WOFF" \
