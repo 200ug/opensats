@@ -2,7 +2,7 @@ import { Map as MaplibreMap } from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 import { initSatellites } from "./tracker"
 import { initCategoryPanel } from "./ui/categories"
-import { OCEAN, LAND, BORDER, CATEGORIES, PALETTE } from "./const"
+import { OCEAN, LAND, BORDER } from "./const"
 
 const map = new MaplibreMap({
     container: "map",
@@ -39,9 +39,6 @@ const map = new MaplibreMap({
 })
 
 map.on("load", async () => {
-    const counts = await initSatellites(map)
-    initCategoryPanel(
-        map,
-        CATEGORIES.map((id) => ({ id, label: id, color: PALETTE.get(id)!, count: counts[id] ?? 0 }))
-    )
+    const categories = await initSatellites(map)
+    initCategoryPanel(map, categories)
 })

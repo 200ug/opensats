@@ -9,18 +9,61 @@ import {
     type OMMJsonObject,
     type SatRec
 } from "satellite.js"
-import {
-    CELESTRAK_FETCH_DELAY_MS,
-    OMM_CACHE_KEY,
-    OMM_CACHE_TTL,
-    PALETTE,
-    SQUARE_ICON_SIZE
-} from "./const"
+import { CELESTRAK_FETCH_DELAY_MS, OMM_CACHE_KEY, OMM_CACHE_TTL, SQUARE_ICON_SIZE } from "./const"
+
+interface SatelliteEntry {
+    norad_id: number
+    name: string
+    img_path?: string
+    platform?: string
+    data: {
+        portal_name: string
+        url: string
+    }
+}
+
+interface SatelliteCategory {
+    name: string
+    color: string
+    description: string
+    satellites: SatelliteEntry[]
+}
+
+interface SatelliteRegistry {
+    categories: SatelliteCategory[]
+}
 
 export interface SatelliteRecord {
     noradId: number
     name: string
     category: string
+    color: string
+}
+
+interface LoadedSatellites {
+    categories: CategoryMeta[]
+    satellites: SatelliteRecord[]
+}
+
+async function loadSatellites(): Promise<LoadedSatellites> {
+    const registry: SatelliteRegistry = await (await fetch("/data/satellites.json")).json()
+
+    const categories = registry.categories.map((cat) => ({
+        id: cat.name,
+        label: cat.name,
+        color: cat.color
+    }))
+
+    const satellites = registry.categories.flatMap((cat) =>
+        cat.satellites.map((sat) => ({
+            noradId: sat.norad_id,
+            name: sat.name,
+            category: cat.name,
+            color: cat.color
+        }))
+    )
+
+    return { categories, satellites }
 }
 
 interface TrackedSatellite extends SatelliteRecord {
@@ -45,7 +88,10 @@ interface FeatureCollection {
 
 interface OmmCache {
     fetchedAt: number
-    sats: { noradId: number; omm: OMMJsonObject }[]
+    sats: {
+        noradId: number
+        omm: OMMJsonObject
+    }[]
 }
 
 const emptyFc = (): FeatureCollection => ({ type: "FeatureCollection", features: [] })
@@ -112,21 +158,26 @@ async function getOmmData(wantedIds: number[]): Promise<Map<number, OMMJsonObjec
     return cached ? toMap(cached) : new Map()
 }
 
-export async function initSatellites(map: MaplibreMap): Promise<Record<string, number>> {
-    const registry: SatelliteRecord[] = await (await fetch("/data/satellites.json")).json()
-    const ommData = await getOmmData(registry.map((s) => s.noradId))
+export interface CategoryMeta {
+    id: string
+    label: string
+    color: string
+    count?: number
+}
+
+export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> {
+    const { categories, satellites } = await loadSatellites()
+    const ommData = await getOmmData([...new Set(satellites.map((s) => s.noradId))])
 
     const counts: Record<string, number> = {}
     const tracked: TrackedSatellite[] = []
 
-    for (const s of registry) {
+    for (const s of satellites) {
         const omm = ommData.get(s.noradId)
-
         if (!omm) {
             console.warn(`[tracker] skipping ${s.name}, no OMM data`)
             continue
         }
-
         counts[s.category] = (counts[s.category] ?? 0) + 1
         tracked.push({ ...s, satrec: json2satrec(omm) })
     }
@@ -191,7 +242,7 @@ export async function initSatellites(map: MaplibreMap): Promise<Record<string, n
                             name: s.name,
                             category: s.category,
                             altitude: geo.height,
-                            color: PALETTE.get(s.category) ?? "#ffffff"
+                            color: s.color
                         }
                     } as GeoJsonFeature
                 })
@@ -204,5 +255,5 @@ export async function initSatellites(map: MaplibreMap): Promise<Record<string, n
     tick()
     setInterval(tick, 1000) // 1 Hz
 
-    return counts
+    return categories.map((cat) => ({ ...cat, count: counts[cat.id] ?? 0 }))
 }

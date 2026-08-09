@@ -1,17 +1,295 @@
-[
-    {"noradId": 39084, "name": "Landsat 8", "category": "landsat"},
-    {"noradId": 49260, "name": "Landsat 9", "category": "landsat"},
-    {"noradId": 39634, "name": "Sentinel-1A", "category": "sentinel"},
-    {"noradId": 40697, "name": "Sentinel-2A", "category": "sentinel"},
-    {"noradId": 42063, "name": "Sentinel-2B", "category": "sentinel"},
-    {"noradId": 60989, "name": "Sentinel-2C", "category": "sentinel"},
-    {"noradId": 41335, "name": "Sentinel-3A", "category": "sentinel"},
-    {"noradId": 43437, "name": "Sentinel-3B", "category": "sentinel"},
-    {"noradId": 25994, "name": "Terra", "category": "modis"},
-    {"noradId": 27424, "name": "Aqua", "category": "modis"},
-    {"noradId": 37849, "name": "Suomi NPP", "category": "weather"},
-    {"noradId": 43013, "name": "NOAA-20", "category": "weather"},
-    {"noradId": 54234, "name": "NOAA-21", "category": "weather"},
-    {"noradId": 40336, "name": "CBERS-4", "category": "cbers"},
-    {"noradId": 44883, "name": "CBERS-4A", "category": "cbers"}
-]
+{
+    "categories": [
+        {
+            "name": "landsat",
+            "color": "#ff8700",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 39084,
+                    "name": "Landsat 8",
+                    "img_path": "/images/landsat-8.jpg",
+                    "data": {
+                        "portal_name": "USGS EarthExplorer",
+                        "url": "https://earthexplorer.usgs.gov/"
+                    }
+                },
+                {
+                    "norad_id": 49260,
+                    "name": "Landsat 9",
+                    "img_path": "/images/landsat-9.jpg",
+                    "data": {
+                        "portal_name": "USGS EarthExplorer",
+                        "url": "https://earthexplorer.usgs.gov/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "sentinel",
+            "color": "#ffd300",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 62261,
+                    "name": "Sentinel-1C",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 66315,
+                    "name": "Sentinel-1D",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 40697,
+                    "name": "Sentinel-2A",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 42063,
+                    "name": "Sentinel-2B",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 60989,
+                    "name": "Sentinel-2C",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 41335,
+                    "name": "Sentinel-3A",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 43437,
+                    "name": "Sentinel-3B",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 64723,
+                    "name": "Sentinel-4A",
+                    "platform": "MTG-S1 (Meteosat-13)",
+                    "data": {
+                        "portal_name": "EUMETSAT Data Store",
+                        "url": "https://data.eumetsat.int/"
+                    }
+                },
+                {
+                    "norad_id": 65159,
+                    "name": "Sentinel-5A",
+                    "platform": "MetOp-SG-A1",
+                    "data": {
+                        "portal_name": "EUMETSAT Data Store",
+                        "url": "https://data.eumetsat.int/"
+                    }
+                },
+                {
+                    "norad_id": 42969,
+                    "name": "Sentinel-5P",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 46984,
+                    "name": "Sentinel-6A",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                },
+                {
+                    "norad_id": 66514,
+                    "name": "Sentinel-6B",
+                    "data": {
+                        "portal_name": "Copernicus Data Space Ecosystem",
+                        "url": "https://dataspace.copernicus.eu/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "modis",
+            "color": "#be0aff",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 25994,
+                    "name": "Terra",
+                    "data": {
+                        "portal_name": "NASA LAADS DAAC",
+                        "url": "https://ladsweb.modaps.eosdis.nasa.gov/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "noaa-jpss",
+            "color": "#0aff99",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 43013,
+                    "name": "NOAA-20",
+                    "data": {
+                        "portal_name": "NOAA CLASS",
+                        "url": "https://www.avl.class.noaa.gov/"
+                    }
+                },
+                {
+                    "norad_id": 54234,
+                    "name": "NOAA-21",
+                    "data": {
+                        "portal_name": "NOAA CLASS",
+                        "url": "https://www.avl.class.noaa.gov/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "cbers",
+            "color": "#ff6161",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 40336,
+                    "name": "CBERS-4",
+                    "data": {
+                        "portal_name": "INPE (Brazil) / CRESDA (China)",
+                        "url": "http://www.cbers.inpe.br/"
+                    }
+                },
+                {
+                    "norad_id": 44883,
+                    "name": "CBERS-4A",
+                    "data": {
+                        "portal_name": "INPE (Brazil) / CRESDA (China)",
+                        "url": "http://www.cbers.inpe.br/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "nisar",
+            "color": "#deff0a",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 65053,
+                    "name": "NISAR",
+                    "data": {
+                        "portal_name": "Alaska Satellite Facility DAAC",
+                        "url": "https://search.asf.alaska.edu/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "gosat",
+            "color": "#6caef9",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 38337,
+                    "name": "GOSAT",
+                    "data": {
+                        "portal_name": "GOSAT Data Archive Service (GDAS)",
+                        "url": "https://data2.gosat.nies.go.jp/"
+                    }
+                },
+                {
+                    "norad_id": 44034,
+                    "name": "GOSAT-2",
+                    "data": {
+                        "portal_name": "GOSAT-2 Product Archive",
+                        "url": "https://prdct.gosat-2.nies.go.jp/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "himawari",
+            "color": "#d90368",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 40267,
+                    "name": "Himawari-8",
+                    "data": {
+                        "portal_name": "JMA Data Dissemination System (JDDS)",
+                        "url": "https://www.jma.go.jp/en/gms/"
+                    }
+                },
+                {
+                    "norad_id": 41836,
+                    "name": "Himawari-9",
+                    "data": {
+                        "portal_name": "JMA Data Dissemination System (JDDS)",
+                        "url": "https://www.jma.go.jp/en/gms/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "goes",
+            "color": "#af8aff",
+            "description": "",
+            "satellites": [
+                {
+                    "norad_id": 41866,
+                    "name": "GOES 16",
+                    "data": {
+                        "portal_name": "NOAA Open Data Dissemination (NODD)",
+                        "url": "https://registry.opendata.aws/noaa-goes/"
+                    }
+                },
+                {
+                    "norad_id": 43226,
+                    "name": "GOES 17",
+                    "data": {
+                        "portal_name": "NOAA Open Data Dissemination (NODD)",
+                        "url": "https://registry.opendata.aws/noaa-goes/"
+                    }
+                },
+                {
+                    "norad_id": 51850,
+                    "name": "GOES 18",
+                    "data": {
+                        "portal_name": "NOAA Open Data Dissemination (NODD)",
+                        "url": "https://registry.opendata.aws/noaa-goes/"
+                    }
+                },
+                {
+                    "norad_id": 60133,
+                    "name": "GOES 19",
+                    "data": {
+                        "portal_name": "NOAA Open Data Dissemination (NODD)",
+                        "url": "https://registry.opendata.aws/noaa-goes/"
+                    }
+                }
+            ]
+        }
+    ]
+}

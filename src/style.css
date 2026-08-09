@@ -2,7 +2,7 @@
 
 @font-face {
     font-family: "ShareTechMono";
-    src: url("/fonts/ShareTechMono-Regular.woff2") format("woff2");;
+    src: url("/fonts/ShareTechMono-Regular.woff2") format("woff2");
 }
 
 @theme {
@@ -13,16 +13,9 @@
     --default-font-family: "ShareTechMono", monospace;
 }
 
-/* satellite category colors; read imperatively via getComputedStyle, so they
-   live outside @theme (tailwind drops theme vars that no utility uses) */
 :root {
-    --sat-landsat: #ffb000;
-    --sat-sentinel: #33ccff;
-    --sat-modis: #ff66cc;
-    --sat-weather: #33ff66;
-    --sat-cbers: #ff5533;
-
-    /* TODO: rectangle selection color */
+    /* TODO: adjust once actually utilized */
+    --sel-rectangle: #c0ca;
 }
 
 /* maplibre handles its own canvas internally, utils can't be attached to it */
