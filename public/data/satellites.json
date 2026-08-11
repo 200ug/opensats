@@ -89,7 +89,7 @@
                 {
                     "norad_id": 64723,
                     "name": "Sentinel-4A",
-                    "platform": "MTG-S1 (Meteosat-13)",
+                    "platform": "MTG-S1",
                     "data": {
                         "portal_name": "EUMETSAT Data Store",
                         "url": "https://data.eumetsat.int/"
@@ -98,7 +98,7 @@
                 {
                     "norad_id": 65159,
                     "name": "Sentinel-5A",
-                    "platform": "MetOp-SG-A1",
+                    "platform": "MetOp-SGA1",
                     "data": {
                         "portal_name": "EUMETSAT Data Store",
                         "url": "https://data.eumetsat.int/"
@@ -212,7 +212,7 @@
             "description": "",
             "satellites": [
                 {
-                    "norad_id": 38337,
+                    "norad_id": 33492,
                     "name": "GOSAT",
                     "data": {
                         "portal_name": "GOSAT Data Archive Service (GDAS)",
@@ -220,7 +220,7 @@
                     }
                 },
                 {
-                    "norad_id": 44034,
+                    "norad_id": 43672,
                     "name": "GOSAT-2",
                     "data": {
                         "portal_name": "GOSAT-2 Product Archive",
@@ -257,22 +257,6 @@
             "color": "#af8aff",
             "description": "",
             "satellites": [
-                {
-                    "norad_id": 41866,
-                    "name": "GOES 16",
-                    "data": {
-                        "portal_name": "NOAA Open Data Dissemination (NODD)",
-                        "url": "https://registry.opendata.aws/noaa-goes/"
-                    }
-                },
-                {
-                    "norad_id": 43226,
-                    "name": "GOES 17",
-                    "data": {
-                        "portal_name": "NOAA Open Data Dissemination (NODD)",
-                        "url": "https://registry.opendata.aws/noaa-goes/"
-                    }
-                },
                 {
                     "norad_id": 51850,
                     "name": "GOES 18",
