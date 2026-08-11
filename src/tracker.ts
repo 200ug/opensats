@@ -86,6 +86,22 @@ interface FeatureCollection {
     features: GeoJsonFeature[]
 }
 
+interface GeoJsonLineString {
+    type: "LineString"
+    coordinates: [number, number][]
+}
+
+interface GeoJsonLineFeature {
+    type: "Feature"
+    geometry: GeoJsonLineString
+    properties: Record<string, unknown>
+}
+
+interface GeoJsonLineCollection {
+    type: "FeatureCollection"
+    features: GeoJsonLineFeature[]
+}
+
 interface OmmCache {
     fetchedAt: number
     sats: {
@@ -95,6 +111,7 @@ interface OmmCache {
 }
 
 const emptyFc = (): FeatureCollection => ({ type: "FeatureCollection", features: [] })
+const emptyLineFc = (): GeoJsonLineCollection => ({ type: "FeatureCollection", features: [] })
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 function readCache(): OmmCache | null {
@@ -158,12 +175,50 @@ async function getOmmData(wantedIds: number[]): Promise<Map<number, OMMJsonObjec
     return cached ? toMap(cached) : new Map()
 }
 
+function computePeriod(satrec: SatRec): number {
+    return ((2 * Math.PI) / satrec.no) * 60 * 1000
+}
+
+function computeTrace(satrec: SatRec, now: Date, periodMs: number): [number, number][] {
+    const stepMs = periodMs / 360
+    const halfPeriod = periodMs / 2
+    const startMs = now.getTime() - halfPeriod
+    const endMs = now.getTime() + halfPeriod
+
+    const raw: [number, number][] = []
+    for (let t = startMs; t <= endMs; t += stepMs) {
+        const d = new Date(t)
+        const gmst = gstime(d)
+        const pos = propagate(satrec, d)?.position
+        if (!pos || typeof pos === "boolean") continue
+        const geo = eciToGeodetic(pos, gmst)
+        raw.push([degreesLong(geo.longitude), degreesLat(geo.latitude)])
+    }
+
+    const points: [number, number][] = []
+    for (let i = 0; i < raw.length; i++) {
+        if (i === 0) {
+            points.push([raw[i][0], raw[i][1]])
+            continue
+        }
+        const prevLon = points[i - 1][0]
+        let delta = raw[i][0] - raw[i - 1][0]
+        if (delta > 180) delta -= 360
+        if (delta < -180) delta += 360
+        points.push([prevLon + delta, raw[i][1]])
+    }
+
+    return points
+}
+
 export interface CategoryMeta {
     id: string
     label: string
     color: string
     count?: number
 }
+
+let selectedNoradId: number | null = null
 
 export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> {
     const { categories, satellites } = await loadSatellites()
@@ -183,6 +238,7 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
     }
 
     map.addSource("sats", { type: "geojson", data: emptyFc() })
+    map.addSource("sat-trace", { type: "geojson", data: emptyLineFc() })
 
     map.addImage(
         "square",
@@ -195,12 +251,41 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
     )
 
     map.addLayer({
+        id: "sat-trace",
+        type: "line",
+        source: "sat-trace",
+        paint: {
+            "line-color": ["get", "color"],
+            "line-width": 1.5,
+            "line-opacity": 0.6,
+            "line-dasharray": [2, 2]
+        }
+    })
+
+    map.addLayer({
+        id: "sats-glow",
+        type: "symbol",
+        source: "sats",
+        filter: ["==", ["get", "selected"], true],
+        layout: {
+            "icon-image": "square",
+            "icon-size": 2.5,
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true
+        },
+        paint: {
+            "icon-color": ["get", "color"],
+            "icon-opacity": 0.25
+        }
+    })
+
+    map.addLayer({
         id: "sats",
         type: "symbol",
         source: "sats",
         layout: {
             "icon-image": "square",
-            "icon-size": 1,
+            "icon-size": ["case", ["get", "selected"], 1.8, 1],
             "icon-allow-overlap": true,
             "icon-ignore-placement": true,
             "text-field": ["get", "name"],
@@ -219,6 +304,25 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
             "text-halo-width": 1
         }
     })
+
+    const setTrace = (sat: TrackedSatellite | null) => {
+        if (!sat) {
+            ;(map.getSource("sat-trace") as GeoJSONSource).setData(emptyLineFc())
+            return
+        }
+        const periodMs = computePeriod(sat.satrec)
+        const coords = computeTrace(sat.satrec, new Date(), periodMs)
+        ;(map.getSource("sat-trace") as GeoJSONSource).setData({
+            type: "FeatureCollection",
+            features: [
+                {
+                    type: "Feature",
+                    geometry: { type: "LineString", coordinates: coords },
+                    properties: { color: sat.color }
+                }
+            ]
+        })
+    }
 
     const tick = () => {
         const now = new Date()
@@ -239,10 +343,12 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
                             coordinates: [degreesLong(geo.longitude), degreesLat(geo.latitude)]
                         },
                         properties: {
+                            noradId: s.noradId,
                             name: s.name,
                             category: s.category,
                             altitude: geo.height,
-                            color: s.color
+                            color: s.color,
+                            selected: s.noradId === selectedNoradId
                         }
                     } as GeoJsonFeature
                 })
@@ -254,6 +360,35 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
 
     tick()
     setInterval(tick, 1000) // 1 Hz
+
+    map.on("mouseenter", "sats", () => {
+        map.getCanvas().style.cursor = "pointer"
+    })
+    map.on("mouseleave", "sats", () => {
+        map.getCanvas().style.cursor = ""
+    })
+
+    map.on("click", "sats", (e) => {
+        if (!e.features || e.features.length === 0) return
+        const noradId = e.features[0]?.properties?.noradId as number
+        if (selectedNoradId === noradId) {
+            selectedNoradId = null
+            setTrace(null)
+        } else {
+            selectedNoradId = noradId
+            setTrace(tracked.find((t) => t.noradId === noradId) ?? null)
+        }
+        tick()
+    })
+
+    map.on("click", (e) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["sats"] })
+        if (features.length === 0 && selectedNoradId !== null) {
+            selectedNoradId = null
+            setTrace(null)
+            tick()
+        }
+    })
 
     return categories.map((cat) => ({ ...cat, count: counts[cat.id] ?? 0 }))
 }
