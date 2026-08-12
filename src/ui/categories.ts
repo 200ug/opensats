@@ -1,11 +1,5 @@
 import type { FilterSpecification, Map as MaplibreMap } from "maplibre-gl"
-
-export interface CategoryMeta {
-    id: string
-    label: string
-    color: string
-    count: number
-}
+import type { CategoryMeta } from "../tracker"
 
 export function initCategoryPanel(map: MaplibreMap, categories: CategoryMeta[]) {
     const panel = document.createElement("div")

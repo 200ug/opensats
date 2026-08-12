@@ -8,8 +8,10 @@ const css = (name: string, fallback: string) =>
 export const OCEAN = css("--color-crt-bg", "#050805")
 export const LAND = css("--color-land", "#101010")
 export const BORDER = css("--color-border", "#d0d0cb")
+export const SELECTION = css("--color-selection", "#00e5ff")
 
 export const SQUARE_ICON_SIZE = 8
+export const SAT_HIT_RADIUS = 12
 
 /* data */
 

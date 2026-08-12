@@ -9,7 +9,13 @@ import {
     type OMMJsonObject,
     type SatRec
 } from "satellite.js"
-import { CELESTRAK_FETCH_DELAY_MS, OMM_CACHE_KEY, OMM_CACHE_TTL, SQUARE_ICON_SIZE } from "./const"
+import {
+    CELESTRAK_FETCH_DELAY_MS,
+    OMM_CACHE_KEY,
+    OMM_CACHE_TTL,
+    SQUARE_ICON_SIZE,
+    SAT_HIT_RADIUS
+} from "./const"
 
 interface SatelliteEntry {
     norad_id: number
@@ -41,7 +47,7 @@ export interface SatelliteRecord {
 }
 
 interface LoadedSatellites {
-    categories: CategoryMeta[]
+    categories: Omit<CategoryMeta, "count">[]
     satellites: SatelliteRecord[]
 }
 
@@ -196,16 +202,22 @@ function computeTrace(satrec: SatRec, now: Date, periodMs: number): [number, num
     }
 
     const points: [number, number][] = []
-    for (let i = 0; i < raw.length; i++) {
-        if (i === 0) {
-            points.push([raw[i][0], raw[i][1]])
+    let prevRawLon: number | null = null
+    let prevLon = 0
+
+    for (const pt of raw) {
+        if (prevRawLon === null) {
+            prevRawLon = pt[0]
+            prevLon = pt[0]
+            points.push([pt[0], pt[1]])
             continue
         }
-        const prevLon = points[i - 1][0]
-        let delta = raw[i][0] - raw[i - 1][0]
+        let delta = pt[0] - prevRawLon
         if (delta > 180) delta -= 360
         if (delta < -180) delta += 360
-        points.push([prevLon + delta, raw[i][1]])
+        prevLon += delta
+        points.push([prevLon, pt[1]])
+        prevRawLon = pt[0]
     }
 
     return points
@@ -215,12 +227,18 @@ export interface CategoryMeta {
     id: string
     label: string
     color: string
-    count?: number
+    count: number
+}
+
+export interface SatelliteController {
+    categories: CategoryMeta[]
+    deselect: () => void
+    onSelect: (cb: (noradId: number | null) => void) => void
 }
 
 let selectedNoradId: number | null = null
 
-export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> {
+export async function initSatellites(map: MaplibreMap): Promise<SatelliteController> {
     const { categories, satellites } = await loadSatellites()
     const ommData = await getOmmData([...new Set(satellites.map((s) => s.noradId))])
 
@@ -305,6 +323,17 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
         }
     })
 
+    // invisible, enlarged click target so satellites can be picked over land
+    map.addLayer({
+        id: "sats-hit",
+        type: "circle",
+        source: "sats",
+        paint: {
+            "circle-radius": SAT_HIT_RADIUS,
+            "circle-opacity": 0
+        }
+    })
+
     const setTrace = (sat: TrackedSatellite | null) => {
         if (!sat) {
             ;(map.getSource("sat-trace") as GeoJSONSource).setData(emptyLineFc())
@@ -361,34 +390,40 @@ export async function initSatellites(map: MaplibreMap): Promise<CategoryMeta[]> 
     tick()
     setInterval(tick, 1000) // 1 Hz
 
-    map.on("mouseenter", "sats", () => {
+    let selectCb: ((noradId: number | null) => void) | null = null
+
+    const setSelection = (noradId: number | null) => {
+        selectedNoradId = noradId
+        setTrace(noradId === null ? null : (tracked.find((t) => t.noradId === noradId) ?? null))
+        tick()
+        selectCb?.(noradId)
+    }
+
+    map.on("mouseenter", "sats-hit", () => {
         map.getCanvas().style.cursor = "pointer"
     })
-    map.on("mouseleave", "sats", () => {
+    map.on("mouseleave", "sats-hit", () => {
         map.getCanvas().style.cursor = ""
     })
 
-    map.on("click", "sats", (e) => {
+    map.on("click", "sats-hit", (e) => {
         if (!e.features || e.features.length === 0) return
         const noradId = e.features[0]?.properties?.noradId as number
-        if (selectedNoradId === noradId) {
-            selectedNoradId = null
-            setTrace(null)
-        } else {
-            selectedNoradId = noradId
-            setTrace(tracked.find((t) => t.noradId === noradId) ?? null)
-        }
-        tick()
+        setSelection(selectedNoradId === noradId ? null : noradId)
     })
 
     map.on("click", (e) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["sats"] })
+        const features = map.queryRenderedFeatures(e.point, { layers: ["sats-hit"] })
         if (features.length === 0 && selectedNoradId !== null) {
-            selectedNoradId = null
-            setTrace(null)
-            tick()
+            setSelection(null)
         }
     })
 
-    return categories.map((cat) => ({ ...cat, count: counts[cat.id] ?? 0 }))
+    return {
+        categories: categories.map((cat) => ({ ...cat, count: counts[cat.id] ?? 0 })),
+        deselect: () => setSelection(null),
+        onSelect: (cb) => {
+            selectCb = cb
+        }
+    }
 }
